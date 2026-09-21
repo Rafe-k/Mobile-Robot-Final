@@ -79,10 +79,10 @@ void loop() {
   }
 
   if (digitalRead(button1)){ // this will be replaced with another trigger
-  digitalWrite(led1, HIGH); // motor 1 and motor 2 forward
-  digitalWrite(led2, LOW);
-  digitalWrite(led3, HIGH);
-  digitalWrite(led4, LOW);
+    digitalWrite(led1, HIGH); // motor 1 and motor 2 forward
+    digitalWrite(led2, LOW);
+    digitalWrite(led3, HIGH);
+    digitalWrite(led4, LOW);
   } else if (digitalRead(button2)){
     digitalWrite(led1, LOW); // motor 1 and motor 2 backwards
     digitalWrite(led2, HIGH);
