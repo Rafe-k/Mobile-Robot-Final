@@ -1,5 +1,11 @@
 #include <SPI.h>
 #include <MFRC522.h>
+#include <QTRSensors.h>
+
+QTRSensors qtr;
+
+const uint8_t SensorCount = 1;
+uint16_t sensorValues[SensorCount];
 
 #define SS_PIN 10
 #define RST_PIN 9
@@ -19,6 +25,7 @@ byte readBackBlock[18];
 #define sensorOut A4
 #define OE 0
 
+
 int frequency = 0;
 
 
@@ -28,13 +35,26 @@ unsigned long currentMillis = 0;
 unsigned long previousColourRed = 0;
 unsigned long previousColourGreen = 0;
 unsigned long previousColourBlue = 0;
+unsigned long previousLineSensor = 0;
+
+
+int colourRedInterval = 100;
+int colourGreenInterval = 100;
+int colourBlueInterval = 100;
+int lineSensorInterval = 100;
 
 const int motor2Forward = 7;
 const int motor2Back = 6;
 const int motor1Forward = 3;
 const int motor1Back = 2;
 
+const int lineSensor = A5;
+
 void setup() {
+
+  qtr.setTypeAnalog();
+  qtr.setSensorPins((const uint8_t[]){}, SensorCount);
+
   pinMode(motor2Forward, OUTPUT);
   pinMode(motor2Back, OUTPUT);
   pinMode(motor1Forward, OUTPUT);
@@ -52,6 +72,8 @@ void setup() {
   digitalWrite(S1, LOW);
 
   digitalWrite(OE, HIGH);
+
+  pinMode(lineSensor, INPUT);
 
   Serial.begin(9600);
 
@@ -149,4 +171,72 @@ void colourSensor()
   delay(1000);
 
   
+}
+
+void AnalogArrayFunc(){
+  qtr.read(sensorValues);
+
+  for (uint8_t i = 0; i < SensorCount; i++){
+    Serial.print(sensorValues[i]);
+    Serial.print('\t');
+  }
+  Serial.println();
+
+  delay(250);
+}
+
+void LineSensor(0){
+  int s1 = digitalRead(lineSensor);
+  Serial.println(s1);
+  delay(100);
+}
+
+void MillisFunction(){
+  currentMillis = millis();
+
+  //event 1
+  RedMillis();
+}
+
+void RedMillis(){
+  if (currentMillis - previousColourRed >= colourRedInterval){
+    if (digitalRead(S2) == LOW && digitalRead(S3) == LOW){
+      digitalWrite(S2, HIGH);
+      digitalWrite(S3, HIGH);
+    } else {
+      digitalWrite(S2, LOW);
+      digitalWrite(S3, LOW);
+    }
+    previousColourRed = currentMillis;
+  }
+}
+
+void GreenMillis(){
+  if (currentMillis - previousColourGreen >= colourGreenInterval){
+    if (digitalRead(S2) == HIGH && digitalRead(S3) == HIGH){
+      digitalWrite(S2, LOW);
+      digitalWrite(S3, HIGH);
+    } else {
+      digitalWrite(S2, HIGH);
+      digitalWrite(S3, HIGH);
+    }
+    previousColourGreen = currentMillis;
+  }
+}
+
+void BlueMillis(){
+  if (currentMillis - previousColourBlue >= colourBlueInterval){
+    if (digitalRead(S2) == LOW && digitalRead(S3) == HIGH){
+      digitalWrite(S2, LOW);
+      digitalWrite(S3, LOW);
+    } else {
+      digitalWrite(S2, LOW);
+      digitalWrite(S3, HIGH);
+    }
+    previousColourBlue = currentMillis;
+  }
+}
+
+void LineSensorMillis(){
+
 }
