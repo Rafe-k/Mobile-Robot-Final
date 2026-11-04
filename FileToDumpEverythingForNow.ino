@@ -14,7 +14,7 @@ MFRC522 mfrc522(SS_PIN, RST_PIN);
 MFRC522::MIFARE_Key key;
 
 int block = 2;
-byte blockContent[16] = {"16CharacterStrng"};
+byte blockContent[16] = {0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x08,0x09,0x0A,0x0B,0x0C,0x0D,0x0E,0x0F,0x10};
 
 byte readBackBlock[18];
 
@@ -87,7 +87,11 @@ void setup() {
     for (byte i = 0; i < 6; i++){
       key.keyByte[i] == 0xFF;
     }
+    
   }
+
+
+
 }
 
 void loop() {
@@ -113,12 +117,12 @@ void loop() {
   // reverse();
 
   //colourSensor();
-  currentMillis = millis();
+  // currentMillis = millis();
 
-  RedMillis();
-  GreenMillis();
-  BlueMillis();
-  LineSensorMillis();
+  // RedMillis();
+  // GreenMillis();
+  // BlueMillis();
+  // LineSensorMillis();
 
   RfidFunc();
   //ReadBlock(block, readBackBlock);
@@ -152,7 +156,7 @@ void Reverse(){
   digitalWrite(motor1Back, HIGH);
   digitalWrite(motor2Back, HIGH);
 }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
+
 void AnalogArrayFunc(){
   qtr.read(sensorValues);
 
@@ -269,7 +273,7 @@ void RfidFunc()
   //read the block back
   ReadBlock(block, readBackBlock);
   //uncomment below line if you want to see the entire 1k memory with the block written into it.
-  //mfrc522.PICC_DumpToSerial(&(mfrc522.uid));
+  mfrc522.PICC_DumpToSerial(&(mfrc522.uid));
 
   //print the block contents
   Serial.print("read block: ");
@@ -281,7 +285,7 @@ void RfidFunc()
   Serial.println("");
 }
 
-int WriteBlock(int blockNumber, byte arrayAdress[])
+int WriteBlock(int blockNumber, byte arrayAddress[])
 {
   //this makes sure that we only write into data blocks. Every 4th block is a trailer block for the access/security info.
   int largestModulo4Number = blockNumber/4*4;
@@ -303,7 +307,7 @@ int WriteBlock(int blockNumber, byte arrayAdress[])
   
 
   //writing the block 
-  status = mfrc522.MIFARE_Write(blockNumber, arrayAdress, 16);
+  status = mfrc522.MIFARE_Write(blockNumber, arrayAddress, 16);
   //status = mfrc522.MIFARE_Write(9, value1Block, 16);  
   if (status != MFRC522::STATUS_OK) {
     Serial.print("MIFARE_Write() failed: ");
@@ -315,8 +319,8 @@ int WriteBlock(int blockNumber, byte arrayAdress[])
 
 int ReadBlock(int blockNumber, byte arrayAddress[]) 
 {
-  int largestModulo4Number=blockNumber/4*4;
-  int trailerBlock=largestModulo4Number+3;//determine trailer block for the sector
+  int largestModulo4Number = blockNumber/4*4;
+  int trailerBlock = largestModulo4Number+3;//determine trailer block for the sector
 
 
   //authentication of the desired block for access
