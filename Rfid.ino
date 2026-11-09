@@ -1,33 +1,4 @@
-
-
-
-void rfidUsingCheck() {
-  do {
-    if (rfidEnabled && digitalRead(button2)){
-      rfidEnabled = false;
-      digitalWrite(led1, HIGH); // change this to play a higher frequency noise with the buzzer
-      digitalWrite(led2, LOW);
-    } else if (digitalRead(button2)){
-      rfidEnabled = true;
-      digitalWrite(led1, LOW); // change this to play a lower frequency noise with the buzzer
-      digitalWrite(led2, HIGH);
-    }
-  } while (digitalRead(button1) == false);
-  
-  if (rfidEnabled){
-    SPI.begin();
-    mfrc522.PCD_Init();
-    Serial.println("RFID line");
-    for (byte i = 0; i < 6; i++) {
-
-      key.keyByte[i] = 0xFF;  //keyByte is defined in the "MIFARE_Key" 'struct' definition in the .h file of the library
-    }
-  }
-
-}
-
-
-void rfidFunc() 
+void RfidFunc() 
 {
     // Look for new cards
   if ( ! mfrc522.PICC_IsNewCardPresent()) {
@@ -44,12 +15,12 @@ void rfidFunc()
   Serial.println("card selected");
 
   //the blockcontent array is written into the card block
-  writeBlock(block, blockcontent);
+  WriteBlock(block, blockContent);
 
   //read the block back
-  readBlock(block, readBackBlock);
+  ReadBlock(block, readBackBlock);
   //uncomment below line if you want to see the entire 1k memory with the block written into it.
-  //mfrc522.PICC_DumpToSerial(&(mfrc522.uid));
+  mfrc522.PICC_DumpToSerial(&(mfrc522.uid));
 
   //print the block contents
   Serial.print("read block: ");
@@ -61,7 +32,7 @@ void rfidFunc()
   Serial.println("");
 }
 
-int writeBlock(int blockNumber, byte arrayAdress[])
+int WriteBlock(int blockNumber, byte arrayAddress[])
 {
   //this makes sure that we only write into data blocks. Every 4th block is a trailer block for the access/security info.
   int largestModulo4Number = blockNumber/4*4;
@@ -83,7 +54,7 @@ int writeBlock(int blockNumber, byte arrayAdress[])
   
 
   //writing the block 
-  status = mfrc522.MIFARE_Write(blockNumber, arrayAdress, 16);
+  status = mfrc522.MIFARE_Write(blockNumber, arrayAddress, 16);
   //status = mfrc522.MIFARE_Write(9, value1Block, 16);  
   if (status != MFRC522::STATUS_OK) {
     Serial.print("MIFARE_Write() failed: ");
@@ -93,10 +64,10 @@ int writeBlock(int blockNumber, byte arrayAdress[])
   Serial.println("block was written");
 }
 
-int readBlock(int blockNumber, byte arrayAddress[]) 
+int ReadBlock(int blockNumber, byte arrayAddress[]) 
 {
-  int largestModulo4Number=blockNumber/4*4;
-  int trailerBlock=largestModulo4Number+3;//determine trailer block for the sector
+  int largestModulo4Number = blockNumber/4*4;
+  int trailerBlock = largestModulo4Number+3;//determine trailer block for the sector
 
 
   //authentication of the desired block for access
