@@ -65,9 +65,9 @@ void BlueMillis(){
 void LineSensorMillis(){
   if (currentMillis - previousLineSensor >= lineSensorInterval){
     if (digitalRead(lineSensor)){
-      digitalWrite(lineSensor, LOW);
+      ClearMotors();
     } else {
-      digitalWrite(lineSensor, HIGH);
+      Forward();
     }
     previousLineSensor = currentMillis;
   }
